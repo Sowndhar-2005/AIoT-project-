@@ -1,3 +1,5 @@
+// Central shared data models for AIoT Sheet-Metal Fabrication System
+
 export interface ProcessItem {
   id: number;
   number: string;
@@ -12,6 +14,117 @@ export interface ProcessItem {
   status: string;
 }
 
+export interface EnclosureRecord {
+  // Identification
+  id: string;
+  orderNumber: string;
+  customerName: string;
+  projectTitle: string;
+  status: 'Draft Requirements' | 'In Engineering' | 'In Fabrication' | 'In Assembly' | 'Pending QA Review' | 'Released (CoC Signed)';
+  
+  // Physical & Material Specs
+  height: number; // mm
+  width: number;  // mm
+  depth: number;  // mm
+  material: string;
+  thickness: number; // mm
+  finish: string;
+  ipRating: string;
+  mountingType: string;
+  doorType: string;
+  lockingType: string;
+  quantity: number;
+  customerNotes: string;
+
+  // Engineering & CAD
+  cadModelRef: string;
+  cadStatus: 'Preliminary' | '3D Modeled' | 'Validation Passed';
+  primaryDrawingImage: string;
+  orthographicViewsImage: string;
+  kFactor: number;
+  bendDeduction: number;
+  flangeCount: number;
+
+  // Selected Components inside
+  selectedComponentIds: string[];
+
+  // Manufacturing & Nesting
+  sheetStandard: string;
+  sheetUtilizationPercent: number;
+  laserCutTimeMinutes: number;
+  bendCyclesCount: number;
+
+  // Quotation & Commercials
+  materialCostPerKg: number;
+  laborRatePerHour: number;
+  taxPercent: number;
+
+  // Quality Inspection Gates State
+  qaGateChecks: {
+    g1_dimensions: boolean;
+    g2_flangeBends: boolean;
+    g3_holePositions: boolean;
+    g4_powderCoatingDFT: boolean;
+    g5_gasketDoorSeal: boolean;
+    g6_earthBonding: boolean;
+  };
+  qaInspectorName: string;
+  qaDate: string;
+  qaApproved: boolean;
+}
+
+export const DEFAULT_ENCLOSURE_RECORD: EnclosureRecord = {
+  id: "ENC-2026-600400200",
+  orderNumber: "ORD-9410-IN",
+  customerName: "Apex Power & Control Systems Ltd.",
+  projectTitle: "AIoT Industrial Modular Control Enclosure",
+  status: "In Engineering",
+
+  height: 600,
+  width: 500,
+  depth: 250,
+  material: "IS 513 CRCA Cold-Rolled Steel Grade D",
+  thickness: 1.5,
+  finish: "Electrostatic Pure Polyester Powder Coat (RAL 7035)",
+  ipRating: "IP55 / NEMA 12 (Dust Protected & Water Splash Proof)",
+  mountingType: "External Wall-Mounting Flange Brackets (4x M8 slots)",
+  doorType: "Single Left-Hinged Door with Polyurethane Gasket",
+  lockingType: "Dual Quarter-Turn Cam Locks with Key",
+  quantity: 5,
+  customerNotes: "Top and bottom removable gland plates required. Internal Din-rail layout must accommodate 24V SMPS and motor contactors with 35mm cable duct clearance.",
+
+  cadModelRef: "SOLIDWORKS-ASM-ENC-600400200.sldasm",
+  cadStatus: "Validation Passed",
+  primaryDrawingImage: "/assets/images/cad/enclosure-drawing-render.png",
+  orthographicViewsImage: "/assets/images/cad/enclosure-drawing-render.png",
+  kFactor: 0.38,
+  bendDeduction: 2.68,
+  flangeCount: 8,
+
+  selectedComponentIds: ["COMP-001", "COMP-002", "COMP-003", "COMP-004", "COMP-006", "COMP-007"],
+
+  sheetStandard: "2500 × 1250 × 1.5 mm CRCA Sheet",
+  sheetUtilizationPercent: 84.7,
+  laserCutTimeMinutes: 14.2,
+  bendCyclesCount: 8,
+
+  materialCostPerKg: 85,
+  laborRatePerHour: 450,
+  taxPercent: 18,
+
+  qaGateChecks: {
+    g1_dimensions: true,
+    g2_flangeBends: true,
+    g3_holePositions: true,
+    g4_powderCoatingDFT: true,
+    g5_gasketDoorSeal: true,
+    g6_earthBonding: true
+  },
+  qaInspectorName: "M. Chen (Senior Metrologist - QA-802)",
+  qaDate: "2026-10-25",
+  qaApproved: false
+};
+
 export const PROCESSES_DATA: ProcessItem[] = [
   {
     id: 1,
@@ -22,7 +135,7 @@ export const PROCESSES_DATA: ProcessItem[] = [
     fullDesc: "Collects customer enclosure requirements (height, width, depth, mounting type, IP54/IP65 ingress protection). Analyzes customer-supplied electrical single-line diagrams and vendor equipment specifications to define structural boundaries and cooling needs.",
     inputs: ["Customer RFQ Form", "Single-Line Diagram (SLD)", "Equipment Datasheets"],
     outputs: ["Verified Dimensional Specification", "Component Intake Checklist", "Approved Design Scope"],
-    tools: ["Angular Web Portal", "FastAPI Scope Verification", "Requirement Extraction AI"],
+    tools: ["Interactive Spec Builder", "FastAPI Scope Verification", "Requirement Extraction Validator"],
     image: "/assets/images/requirements/Rough customer requirements.png",
     status: "Authoritative Engineering Process"
   },
@@ -45,10 +158,10 @@ export const PROCESSES_DATA: ProcessItem[] = [
     title: "AI-Assisted Component Arrangement",
     domain: "manufacturing",
     shortDesc: "Algorithmic placement on mounting plates optimizing thermal convection, DIN rail pitch, and wiring ducts.",
-    fullDesc: "Generates optimal 2D internal component layouts on rear equipment mounting sub-plates. Applies strict domain clearance rules (50mm above/below power supplies, 125mm DIN rail vertical spacing) with mandatory Human-in-the-Loop engineering approval.",
-    inputs: ["Component Dimensions", "Thermal Wattage", "Sub-Plate Bounding Box (800x600mm)"],
+    fullDesc: "Simulates 2D internal component layouts on rear equipment mounting sub-plates. Applies strict domain clearance rules (50mm above/below power supplies, 125mm DIN rail vertical spacing) with mandatory Human-in-the-Loop engineering approval.",
+    inputs: ["Component Dimensions", "Thermal Wattage", "Sub-Plate Bounding Box (600x400mm)"],
     outputs: ["Sub-Plate Component Coordinates (X, Y)", "Clearance Compliance Report", "Approved Arrangement Blueprint"],
-    tools: ["Layout Optimization AI", "Electrical Layout Rules Engine", "Design Approval Gate"],
+    tools: ["Layout Optimization Heuristic Engine", "Electrical Layout Rules Engine", "Design Approval Gate"],
     image: "/assets/images/components/Electrical Control Panel Components Flat Lay.png",
     status: "Authoritative Engineering Process"
   },
@@ -58,11 +171,11 @@ export const PROCESSES_DATA: ProcessItem[] = [
     title: "Final 3D CAD Enclosure Design",
     domain: "manufacturing",
     shortDesc: "SOLIDWORKS parametric modeling of enclosure chassis, door, gland plates, hinges, and locks.",
-    fullDesc: "Complete parametric 3D assembly in SOLIDWORKS. Incorporates native sheet-metal base/edge flanges, corner tear reliefs (1.5x thickness), concealed lift-off hinges, 3-point quarter-turn cam locking, and removable top/bottom gland plates.",
+    fullDesc: "Complete parametric 3D assembly based on verified design requirements. Incorporates native sheet-metal base/edge flanges, corner tear reliefs (1.5x thickness), concealed lift-off hinges, quarter-turn cam locking, and removable top/bottom gland plates.",
     inputs: ["Approved Component Layout", "Chassis Outer Envelope", "Sheet-Metal Gauge (1.5mm/2.0mm)"],
     outputs: ["Master 3D CAD Assembly (.sldasm)", "General Arrangement (GA) Drawing", "Manufacturing Revisions"],
     tools: ["SOLIDWORKS Sheet Metal", "Design Tables", "Parametric Mating"],
-    image: "/assets/images/cad/Electrical Enclosure CAD Blueprint Sheet.png",
+    image: "/assets/images/cad/enclosure-drawing-render.png",
     status: "Authoritative Engineering Process"
   },
   {
@@ -122,12 +235,12 @@ export const PROCESSES_DATA: ProcessItem[] = [
     number: "P-09",
     title: "Dimensional Verification, Painting & Assembly",
     domain: "manufacturing",
-    shortDesc: "Bare-metal trial fit, chemical nanoceramic pre-treatment, RAL 7035 powder coating, and mechanical assembly.",
-    fullDesc: "Receives fabricated part kit from press brake. Verifies mechanical fit-up and door alignment. Applies nanoceramic conversion coating and electrostatic pure polyester powder coat (cured at 190°C, 60-80µm DFT). Assembles hinges, 3-point lock, gland plates, and earth braids.",
+    shortDesc: "Bare-metal trial fit, chemical pre-treatment, RAL 7035 powder coating, and mechanical assembly.",
+    fullDesc: "Receives fabricated part kit from press brake. Verifies mechanical fit-up and door alignment. Applies conversion pre-treatment coating and electrostatic pure polyester powder coat (cured at 190°C, 60-80µm DFT). Assembles hinges, cam lock, gland plates, and earth braids.",
     inputs: ["Formed Components Kit", "Powder Coating Spec (RAL 7035)", "Assembly Hardware Kit"],
     outputs: ["Assembled Electrical Enclosure", "Powder Coat DFT Record", "Job Traveler Staged for QA"],
     tools: ["Powder Coating Line", "Thermal Curing Oven", "Mechanical Assembly Bay"],
-    image: "/assets/images/cad/Electrical Control Panel Engineering Diagram.png",
+    image: "/assets/images/cad/enclosure-drawing-render.png",
     status: "Authoritative Engineering Process"
   },
   {
@@ -136,7 +249,7 @@ export const PROCESSES_DATA: ProcessItem[] = [
     title: "AIoT System Implementation Architecture",
     domain: "digital-systems",
     shortDesc: "6-layer distributed software architecture, FastAPI microservices, PostgreSQL schemas, and MQTT streaming.",
-    fullDesc: "Specifies the software backend, edge gateway telemetry interfaces, relational database entities, asynchronous Celery workers, and role-based Angular web portals connecting factory floor machinery with enterprise engineering management.",
+    fullDesc: "Specifies the software backend, edge gateway telemetry interfaces, relational database entities, asynchronous Celery workers, and role-based web portals connecting factory floor machinery with enterprise engineering management.",
     inputs: ["System Boundary Specifications", "REST / WebSocket Contracts", "Data Ownership Rules"],
     outputs: ["FastAPI Backend Microservices", "PostgreSQL DDL Schema", "MQTT Ingestion Pipeline"],
     tools: ["FastAPI (Python 3.11)", "Eclipse Mosquitto MQTT", "PostgreSQL 16", "Docker Compose"],
@@ -149,10 +262,10 @@ export const PROCESSES_DATA: ProcessItem[] = [
     title: "IoT Job-Tracking Dashboard",
     domain: "digital-systems",
     shortDesc: "Real-time shop-floor state monitoring, station utilization cards, Kanban boards, and immutable event logs.",
-    fullDesc: "Real-time operational dashboard visualizing active fabrication jobs, machine health telemetry, operator station progress, and event timelines. Decoupled from quality release to ensure production velocity never bypasses quality gates.",
+    fullDesc: "Operational tracking preview visualizing active fabrication jobs, machine health telemetry, operator station progress, and event timelines. Decoupled from quality release to ensure production velocity never bypasses quality gates.",
     inputs: ["Machine Telemetry Payloads", "Operator Barcode Scans", "Job ID Status Transitions"],
     outputs: ["Live Kanban Job Board", "Machine Utilization Cards", "Immutable Chronological Event Log"],
-    tools: ["Angular WebSocket Hub", "Tailwind UI", "Redis Real-time Broker"],
+    tools: ["React Telemetry Visualizer", "Tailwind UI", "MQTT Event Simulator"],
     image: "/assets/images/digital-systems/SheetFab AIoT Fabrication Dashboard.png",
     status: "Proposed Engineering Specification"
   },
@@ -197,6 +310,27 @@ export const PROCESSES_DATA: ProcessItem[] = [
   }
 ];
 
+export interface ComponentItem {
+  id: string;
+  name: string;
+  category: string;
+  dimensions: string;
+  mounting: string;
+  powerLoss: string;
+  cadStatus: string;
+  unitCost: number;
+}
+
+export const SAMPLE_COMPONENTS: ComponentItem[] = [
+  { id: "COMP-001", name: "Molded Case Circuit Breaker (MCCB) 3P 100A", category: "Circuit Protection", dimensions: "105 × 165 × 86 mm", mounting: "Chassis M4 Screws", powerLoss: "15.0 W", cadStatus: "Verified 3D (.sldprt)", unitCost: 3200 },
+  { id: "COMP-002", name: "Miniature Circuit Breaker (MCB) 2-Pole C16", category: "Circuit Protection", dimensions: "36 × 85 × 73 mm", mounting: "35mm Top-Hat DIN Rail", powerLoss: "4.8 W", cadStatus: "Verified 3D (.sldprt)", unitCost: 650 },
+  { id: "COMP-003", name: "Switch Mode Power Supply (SMPS) 24V 10A (240W)", category: "Power Supply", dimensions: "60 × 125 × 114 mm", mounting: "35mm Top-Hat DIN Rail", powerLoss: "28.5 W", cadStatus: "Verified 3D (.sldprt)", unitCost: 2800 },
+  { id: "COMP-004", name: "Industrial Motor Contactor 3P 32A + Overload", category: "Motor Control", dimensions: "45 × 140 × 95 mm", mounting: "35mm DIN Rail / M4", powerLoss: "8.2 W", cadStatus: "Verified 3D (.sldprt)", unitCost: 1950 },
+  { id: "COMP-005", name: "Compact Industrial PLC CPU Unit (14 I/O)", category: "Automation & Control", dimensions: "150 × 90 × 80 mm", mounting: "35mm Top-Hat DIN Rail", powerLoss: "12.0 W", cadStatus: "Verified 3D (.sldprt)", unitCost: 9500 },
+  { id: "COMP-006", name: "Slotted PVC Wiring Duct (Panduit) 60x40", category: "Wire Management", dimensions: "60 × 40 × 1000 mm", mounting: "Slotted Base Screws", powerLoss: "0.0 W", cadStatus: "Parametric Model", unitCost: 380 },
+  { id: "COMP-007", name: "Standard 35mm Steel Top-Hat DIN Rail (IEC 60715)", category: "Mounting Hardware", dimensions: "35 × 7.5 × 1000 mm", mounting: "Sub-Plate M5 Studs", powerLoss: "0.0 W", cadStatus: "Standard Part", unitCost: 240 }
+];
+
 export interface JobItem {
   jobId: string;
   orderNumber: string;
@@ -213,10 +347,10 @@ export interface JobItem {
 export const SAMPLE_JOBS: JobItem[] = [
   {
     jobId: "JOB-2026-0042",
-    orderNumber: "ORD-9410",
-    enclosureType: "Industrial Wall-Mount Control Panel (IP55)",
-    dimensions: "800 × 600 × 250 mm",
-    stage: "Process 09: Painting & Assembly",
+    orderNumber: "ORD-9410-IN",
+    enclosureType: "AIoT Industrial Modular Control Enclosure",
+    dimensions: "600 × 500 × 250 mm",
+    stage: "Process 09: Dimensional Verification & Assembly",
     progressPercent: 78,
     status: "In Progress",
     lastUpdated: "10 mins ago",
@@ -258,37 +392,5 @@ export const SAMPLE_JOBS: JobItem[] = [
     lastUpdated: "3 hours ago",
     workCenter: "DISPATCH",
     operator: "A. Patel (QA-Lead)"
-  },
-  {
-    jobId: "JOB-2026-0044",
-    orderNumber: "ORD-9420",
-    enclosureType: "Stainless Steel Food-Grade Terminal Box (304 SS)",
-    dimensions: "600 × 400 × 200 mm",
-    stage: "Process 04: CAD Design Verification",
-    progressPercent: 30,
-    status: "In Progress",
-    lastUpdated: "Just now",
-    workCenter: "CAD-DESK-02",
-    operator: "K. Davis (ENG-04)"
   }
-];
-
-export interface ComponentItem {
-  id: string;
-  name: string;
-  category: string;
-  dimensions: string;
-  mounting: string;
-  powerLoss: string;
-  cadStatus: string;
-}
-
-export const SAMPLE_COMPONENTS: ComponentItem[] = [
-  { id: "COMP-001", name: "Molded Case Circuit Breaker (MCCB) 3P 100A", category: "Circuit Protection", dimensions: "105 × 165 × 86 mm", mounting: "Chassis M4 Screws", powerLoss: "15.0 W", cadStatus: "Verified 3D (.sldprt)" },
-  { id: "COMP-002", name: "Miniature Circuit Breaker (MCB) 2-Pole C16", category: "Circuit Protection", dimensions: "36 × 85 × 73 mm", mounting: "35mm Top-Hat DIN Rail", powerLoss: "4.8 W", cadStatus: "Verified 3D (.sldprt)" },
-  { id: "COMP-003", name: "Switch Mode Power Supply (SMPS) 24V 10A (240W)", category: "Power Supply", dimensions: "60 × 125 × 114 mm", mounting: "35mm Top-Hat DIN Rail", powerLoss: "28.5 W", cadStatus: "Verified 3D (.sldprt)" },
-  { id: "COMP-004", name: "Industrial Motor Contactor 3P 32A + Overload", category: "Motor Control", dimensions: "45 × 140 × 95 mm", mounting: "35mm DIN Rail / M4", powerLoss: "8.2 W", cadStatus: "Verified 3D (.sldprt)" },
-  { id: "COMP-005", name: "Compact Industrial PLC CPU Unit (14 I/O)", category: "Automation & Control", dimensions: "150 × 90 × 80 mm", mounting: "35mm Top-Hat DIN Rail", powerLoss: "12.0 W", cadStatus: "Verified 3D (.sldprt)" },
-  { id: "COMP-006", name: "Slotted PVC Wiring Duct (Panduit) 60x40", category: "Wire Management", dimensions: "60 × 40 × 1000 mm", mounting: "Slotted Base Screws", powerLoss: "0.0 W", cadStatus: "Parametric Model" },
-  { id: "COMP-007", name: "Standard 35mm Steel Top-Hat DIN Rail (IEC 60715)", category: "Mounting Hardware", dimensions: "35 × 7.5 × 1000 mm", mounting: "Sub-Plate M5 Studs", powerLoss: "0.0 W", cadStatus: "Standard Part" }
 ];

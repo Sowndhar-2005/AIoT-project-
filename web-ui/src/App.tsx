@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { OverviewSection } from './components/OverviewSection';
+import { RequirementsSection } from './components/RequirementsSection';
 import { ManufacturingSection } from './components/ManufacturingSection';
-import { AIoTSection } from './components/AIoTSection';
-import { TrackingSection } from './components/TrackingSection';
 import { CADSection } from './components/CADSection';
+import { TrackingSection } from './components/TrackingSection';
 import { QualitySection } from './components/QualitySection';
-import { ArchitectureSection } from './components/ArchitectureSection';
-import { AboutSection } from './components/AboutSection';
-import { DocsPrinciplesSection } from './components/DocsPrinciplesSection';
-import { PROCESSES_DATA, ProcessItem } from './data/projectData';
+import { FinalDocsSection } from './components/FinalDocsSection';
+import { DEFAULT_ENCLOSURE_RECORD, EnclosureRecord, PROCESSES_DATA, ProcessItem } from './data/projectData';
+
+const LOCAL_STORAGE_KEY = 'aiot_sheetfab_enclosure_record';
 
 export function App() {
   const [currentTab, setCurrentTab] = useState<string>('overview');
@@ -18,7 +18,45 @@ export function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<boolean>(false);
   const [selectedProcessId, setSelectedProcessId] = useState<number | null>(null);
 
-  const selectedProcess: ProcessItem | undefined = PROCESSES_DATA.find(p => p.id === selectedProcessId);
+  // Consistent Enclosure Record stored in local state + localStorage
+  const [enclosureRecord, setEnclosureRecord] = useState<EnclosureRecord>(() => {
+    try {
+      const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.warn('Could not read from localStorage, using default record', e);
+    }
+    return DEFAULT_ENCLOSURE_RECORD;
+  });
+
+  // Sync to localStorage
+  useEffect(() => {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(enclosureRecord));
+    } catch (e) {
+      console.warn('Could not save to localStorage', e);
+    }
+  }, [enclosureRecord]);
+
+  const handleUpdateRecord = (updated: Partial<EnclosureRecord>) => {
+    setEnclosureRecord(prev => ({
+      ...prev,
+      ...updated
+    }));
+  };
+
+  const handleResetDemo = () => {
+    if (window.confirm('Reset all demo parameters back to default engineering values?')) {
+      setEnclosureRecord(DEFAULT_ENCLOSURE_RECORD);
+      try {
+        localStorage.removeItem(LOCAL_STORAGE_KEY);
+      } catch (e) {
+        // ignore
+      }
+    }
+  };
 
   const handleSelectProcess = (id: number | null) => {
     setSelectedProcessId(id);
@@ -29,8 +67,17 @@ export function App() {
       case 'overview':
         return (
           <OverviewSection 
+            enclosureRecord={enclosureRecord}
             onNavigate={(tab) => setCurrentTab(tab)}
             onSelectProcess={(id) => handleSelectProcess(id)}
+          />
+        );
+      case 'requirements':
+        return (
+          <RequirementsSection 
+            enclosureRecord={enclosureRecord}
+            onUpdateRecord={handleUpdateRecord}
+            onNavigateToWorkflow={() => setCurrentTab('manufacturing')}
           />
         );
       case 'manufacturing':
@@ -39,25 +86,27 @@ export function App() {
             searchQuery={searchQuery}
             selectedProcessId={selectedProcessId}
             onSelectProcess={(id) => handleSelectProcess(id)}
+            enclosureRecord={enclosureRecord}
+            onNavigate={(tab) => setCurrentTab(tab)}
           />
         );
-      case 'docs-principles':
-        return <DocsPrinciplesSection />;
-      case 'aiot':
-        return <AIoTSection />;
-      case 'tracking':
-        return <TrackingSection />;
       case 'cad':
         return <CADSection />;
+      case 'tracking':
+        return <TrackingSection />;
       case 'quality':
         return <QualitySection />;
-      case 'architecture':
-        return <ArchitectureSection />;
-      case 'about':
-        return <AboutSection />;
+      case 'final-docs':
+        return (
+          <FinalDocsSection 
+            enclosureRecord={enclosureRecord}
+            onUpdateRecord={handleUpdateRecord}
+          />
+        );
       default:
         return (
           <OverviewSection 
+            enclosureRecord={enclosureRecord}
             onNavigate={(tab) => setCurrentTab(tab)}
             onSelectProcess={(id) => handleSelectProcess(id)}
           />
@@ -65,14 +114,18 @@ export function App() {
     }
   };
 
+  const selectedProcess: ProcessItem | undefined = PROCESSES_DATA.find(p => p.id === selectedProcessId);
+
   return (
     <div className="flex h-screen bg-slate-50 font-sans text-slate-900 antialiased overflow-hidden">
-      {/* Sidebar with responsive toggle */}
+      {/* Sidebar with responsive toggle & 7 core items */}
       <Sidebar 
         currentTab={currentTab} 
         setCurrentTab={setCurrentTab} 
         isOpen={mobileMenuOpen}
         setIsOpen={setMobileMenuOpen}
+        enclosureRecord={enclosureRecord}
+        onResetDemo={handleResetDemo}
       />
 
       {/* Main Content Area */}
@@ -83,6 +136,7 @@ export function App() {
           onOpenMobileMenu={() => setMobileMenuOpen(true)}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
+          enclosureRecord={enclosureRecord}
         />
 
         {/* Scrollable Page Body */}
@@ -123,7 +177,7 @@ export function App() {
                 <img 
                   src={selectedProcess.image} 
                   alt={selectedProcess.title} 
-                  className="w-full h-56 object-cover object-center" 
+                  className="w-full h-56 object-contain bg-white p-2" 
                 />
               </div>
             )}

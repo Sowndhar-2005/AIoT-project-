@@ -1,11 +1,13 @@
 import React from 'react';
 import { Menu, Bell, Search } from 'lucide-react';
+import { EnclosureRecord } from '../data/projectData';
 
 interface HeaderProps {
   currentTab: string;
   onOpenMobileMenu: () => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  enclosureRecord: EnclosureRecord;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -13,18 +15,17 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenMobileMenu,
   searchQuery,
   setSearchQuery,
+  enclosureRecord,
 }) => {
   const getTabTitle = (tab: string) => {
     switch (tab) {
-      case 'overview': return 'Engineering Overview & Executive Summary';
-      case 'manufacturing': return '14-Stage Manufacturing Engineering Workflow';
-      case 'docs-principles': return 'Working Principles & Visual Process Documentation';
-      case 'aiot': return 'Connected AIoT Software & Systems Architecture';
-      case 'tracking': return 'Real-Time IoT Production & Job Tracking';
+      case 'overview': return 'Project Overview & Manufacturing Platform';
+      case 'requirements': return 'New Enclosure Specifications & RFQ Intake';
+      case 'manufacturing': return '14-Process Manufacturing Engineering Workflow';
       case 'cad': return 'CAD Design, Digital Component Library & BOM';
-      case 'quality': return 'Computer-Vision Metrology & Quality Assurance';
-      case 'architecture': return 'Cross-Domain System Architecture & Data Flow';
-      case 'about': return 'Project Background & Academic Specification';
+      case 'tracking': return 'Real-Time Production Tracking & Work Order Queue';
+      case 'quality': return 'Computer-Vision Metrology & Quality Acceptance';
+      case 'final-docs': return 'Final Enclosure Release & Document Centre';
       default: return 'Manufacturing Platform';
     }
   };
@@ -45,9 +46,9 @@ export const Header: React.FC<HeaderProps> = ({
             {getTabTitle(currentTab)}
           </h2>
           <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
-            <span>AIoT Sheet-Metal Platform</span>
+            <span>Enclosure: <strong>{enclosureRecord.id}</strong></span>
             <span>&bull;</span>
-            <span className="text-blue-600 font-semibold capitalize">{currentTab.replace('-', ' ')}</span>
+            <span className="text-blue-600 font-semibold">{enclosureRecord.height}×{enclosureRecord.width}×{enclosureRecord.depth}mm</span>
           </div>
         </div>
       </div>
@@ -62,7 +63,7 @@ export const Header: React.FC<HeaderProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search processes, parts, CAD..."
-            className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition"
+            className="w-full pl-9 pr-4 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:bg-white transition"
           />
         </div>
 

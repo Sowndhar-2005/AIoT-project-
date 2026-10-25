@@ -269,15 +269,15 @@ export const CADSection: React.FC = () => {
               </p>
 
               {/* Enclosure Preview Visual */}
-              <div className="rounded-lg overflow-hidden border border-slate-200 bg-slate-50">
+              <div className="rounded-lg overflow-hidden border border-slate-200 bg-white">
                 <img 
-                  src="/assets/images/cad/Electrical Enclosure CAD Blueprint Sheet.png" 
-                  alt="3D CAD Enclosure Model" 
-                  className="w-full h-80 object-cover object-center"
+                  src="/assets/images/cad/enclosure-drawing-render.png" 
+                  alt="3D CAD Enclosure Model and Orthographics" 
+                  className="w-full h-80 object-contain p-2"
                 />
                 <div className="p-3 bg-slate-100 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
-                  <span className="font-medium">Chassis Assembly: AIoT-ENC-600400200</span>
-                  <span className="font-mono">Dimensions: 600 × 400 × 200 mm | Material: CRCA 1.5 mm</span>
+                  <span className="font-medium">Chassis Assembly: SOLIDWORKS-ASM-ENC-600400200.sldasm</span>
+                  <span className="font-mono">Dimensions: 600 × 500 × 250 mm | Material: CRCA 1.5 mm</span>
                 </div>
               </div>
             </div>
