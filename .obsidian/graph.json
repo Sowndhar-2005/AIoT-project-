@@ -5,7 +5,7 @@
   "showAttachments": false,
   "hideUnresolved": false,
   "showOrphans": true,
-  "collapse-color-groups": true,
+  "collapse-color-groups": false,
   "colorGroups": [
     {
       "query": "path:manufacturing",
@@ -48,7 +48,7 @@
   "textFadeMultiplier": 0,
   "nodeSizeMultiplier": 1.15,
   "lineSizeMultiplier": 1,
-  "collapse-forces": true,
+  "collapse-forces": false,
   "centerStrength": 0.52,
   "repelStrength": 12,
   "linkStrength": 1,
