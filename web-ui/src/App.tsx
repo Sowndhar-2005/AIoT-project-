@@ -9,6 +9,7 @@ import { CADSection } from './components/CADSection';
 import { QualitySection } from './components/QualitySection';
 import { ArchitectureSection } from './components/ArchitectureSection';
 import { AboutSection } from './components/AboutSection';
+import { DocsPrinciplesSection } from './components/DocsPrinciplesSection';
 import { PROCESSES_DATA, ProcessItem } from './data/projectData';
 
 export function App() {
@@ -40,6 +41,8 @@ export function App() {
             onSelectProcess={(id) => handleSelectProcess(id)}
           />
         );
+      case 'docs-principles':
+        return <DocsPrinciplesSection />;
       case 'aiot':
         return <AIoTSection />;
       case 'tracking':

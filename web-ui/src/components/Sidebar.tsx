@@ -8,7 +8,7 @@ import {
   CheckCircle2, 
   Network, 
   Info,
-  Menu,
+  BookOpen,
   X
 } from 'lucide-react';
 
@@ -28,6 +28,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'manufacturing', label: 'Manufacturing Workflow', icon: Layers },
+    { id: 'docs-principles', label: 'Documentation & Principles', icon: BookOpen },
     { id: 'aiot', label: 'AIoT System', icon: Cpu },
     { id: 'tracking', label: 'Job Tracking', icon: Activity },
     { id: 'cad', label: 'CAD & Components', icon: Box },
@@ -46,13 +47,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Sidebar Container */}
+      {/* Sidebar Container: flex on desktop, fixed overlay on mobile */}
       <aside className={`
-        fixed top-0 bottom-0 left-0 z-50 w-68 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out
-        lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+        fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-slate-200 flex flex-col transition-transform duration-200 ease-in-out shrink-0
+        lg:static lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Brand Header */}
-        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200">
+        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-200 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-lg shadow-sm">
               S
@@ -98,17 +99,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             );
           })}
         </nav>
-
-        {/* Prototype Scope Badge */}
-        <div className="p-4 m-3 bg-slate-50 rounded-xl border border-slate-200/80">
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="text-xs font-semibold text-slate-700">UI Prototype Active</span>
-          </div>
-          <p className="text-[11px] text-slate-500 leading-relaxed">
-            Frontend demonstration interface powered by verified project specifications.
-          </p>
-        </div>
       </aside>
     </>
   );
