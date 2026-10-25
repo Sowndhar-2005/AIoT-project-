@@ -1,0 +1,21 @@
+# Obsidian Vault .gitignore
+
+# Backup folders
+_backup_image/
+_backup_process/
+_pre_migration_backup/
+
+# Obsidian internal caches & system logs
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/graph.json.bak
+.obsidian/cache/
+
+# OS and temporary files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+__pycache__/
+*.pyc

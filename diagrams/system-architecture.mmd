@@ -1,0 +1,46 @@
+flowchart TB
+    subgraph FactoryEdge["1. Physical Factory & Edge Ingestion"]
+        Laser["CNC Fiber Laser Cutter"]
+        Brake["CNC Press Brake"]
+        Sensors["Current Clamps & Gas Pressure Sensors"]
+        Cam["20MP Top-Down Metrology Camera"]
+        Gateway["ESP32-S3 / Linux Edge IPC Gateway"]
+    end
+
+    subgraph MessageBroker["2. Real-Time Message Streaming"]
+        MQTT["Mosquitto MQTT Broker (TLS, QoS 1)"]
+        Buffer["Edge Store-and-Forward Buffer"]
+    end
+
+    subgraph CoreServices["3. Central Backend & Storage Layer"]
+        FastAPI["FastAPI REST & WebSocket Gateway"]
+        CeleryWorker["Celery Asynchronous Task Workers"]
+        Postgres[("PostgreSQL 16 Master Relational DB")]
+        MinIO[("MinIO Distributed Object Store")]
+    end
+
+    subgraph AIAndCAD["4. Specialized AI & CAD Computational Services"]
+        DocAI["Document Requirement Extractor"]
+        NestEngine["Geometry-Aware Nesting Solver"]
+        CVService["OpenCV Optical Metrology Service"]
+        CADSidecar["Windows CAD Sidecar (SOLIDWORKS COM)"]
+    end
+
+    subgraph Portals["5. Multi-Role Web Applications (Angular)"]
+        CustUI["Customer Portal"]
+        EngUI["Engineering & Quotation Hub"]
+        ShopUI["Shop-Floor Operator Workstation"]
+        QAUI["Metrology & Quality Workstation"]
+        MgrUI["Executive Production Dashboard"]
+    end
+
+    Laser & Brake & Sensors --> Gateway
+    Cam --> Gateway
+    Gateway --> Buffer --> MQTT --> FastAPI
+    
+    FastAPI <--> Postgres
+    FastAPI <--> MinIO
+    FastAPI --> CeleryWorker
+    CeleryWorker <--> AIAndCAD
+    
+    FastAPI <--> Portals

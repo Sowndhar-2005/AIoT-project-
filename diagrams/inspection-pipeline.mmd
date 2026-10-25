@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph Capture["1. Optical Capture (Process 12)"]
+        CamHardware["20MP Monochrome Camera\n+ Telecentric Lens"] --> Backlight["Diffuse LED Backlight Table"]
+        Backlight --> RawFrame["Raw Calibrated Frame (5472 × 3648 px)"]
+    end
+
+    subgraph FeatureExtraction["2. CV Analysis (Process 13)"]
+        RawFrame --> Undistort["Lens Undistortion & Metric Homography"]
+        Undistort --> CannySubpix["Sub-Pixel Canny Edge Detection"]
+        CannySubpix --> ICPReg["ICP Coordinate Alignment with CAD DXF"]
+        ICPReg --> DeltaMath["Calculate Deviations (Δ = Measured - Nominal)"]
+        DeltaMath --> Heatmap["Annotated Deviation Vector Overlay"]
+    end
+
+    subgraph FinalRelease["3. Final QA Release Gate (Process 14)"]
+        Heatmap --> QAScreen["Inspector Review Workstation"]
+        PhysicalGates["Gates 1-6: Dimensions, Coating, Assembly,\nMechanics, Earth Bonding, BOM Audit"] --> QAScreen
+        QAScreen --> HumanDecision{"Inspector Sign-Off?"}
+        HumanDecision -- "Pass" --> CoC["Digitally Signed Certificate of Conformance (CoC)"]
+        HumanDecision -- "Fail" --> NCR["Non-Conformance Report & Quarantine"]
+    end
