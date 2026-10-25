@@ -1,22 +1,58 @@
 {
   "collapse-filter": false,
   "search": "",
-  "showTags": false,
+  "showTags": true,
   "showAttachments": false,
   "hideUnresolved": false,
   "showOrphans": true,
-  "collapse-color-groups": false,
-  "colorGroups": [],
-  "collapse-display": false,
-  "showArrow": false,
+  "collapse-color-groups": true,
+  "colorGroups": [
+    {
+      "query": "path:manufacturing",
+      "color": {
+        "a": 1,
+        "rgb": 15024945
+      }
+    },
+    {
+      "query": "path:digital-systems",
+      "color": {
+        "a": 1,
+        "rgb": 2862847
+      }
+    },
+    {
+      "query": "path:quality-inspection",
+      "color": {
+        "a": 1,
+        "rgb": 4386638
+      }
+    },
+    {
+      "query": "path:decisions",
+      "color": {
+        "a": 1,
+        "rgb": 16753920
+      }
+    },
+    {
+      "query": "path:diagrams",
+      "color": {
+        "a": 1,
+        "rgb": 12015560
+      }
+    }
+  ],
+  "collapse-display": true,
+  "showArrow": true,
   "textFadeMultiplier": 0,
-  "nodeSizeMultiplier": 1,
+  "nodeSizeMultiplier": 1.15,
   "lineSizeMultiplier": 1,
-  "collapse-forces": false,
-  "centerStrength": 0.518713248970312,
-  "repelStrength": 10,
+  "collapse-forces": true,
+  "centerStrength": 0.52,
+  "repelStrength": 12,
   "linkStrength": 1,
-  "linkDistance": 250,
-  "scale": 0.25883865621816143,
+  "linkDistance": 220,
+  "scale": 0.34999999999999987,
   "close": true
 }
