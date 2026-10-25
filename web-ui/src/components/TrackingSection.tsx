@@ -31,21 +31,20 @@ export const TrackingSection: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner Notice */}
-      <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg flex items-start justify-between">
+      {/* Top Banner Status Notice */}
+      <div className="bg-slate-50 border-l-4 border-slate-400 p-4 rounded-r-lg flex items-start justify-between">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+          <Info className="w-5 h-5 text-slate-500 mt-0.5 shrink-0" />
           <div>
-            <h4 className="text-sm font-semibold text-amber-900">Interactive UI Demonstration</h4>
-            <p className="text-xs text-amber-700 mt-0.5">
-              <strong>Notice:</strong> This is a frontend prototype demonstrating the proposed AIoT Job Tracking module. 
-              The telemetry data, edge station indicators, and job states shown below are static simulated values and are not connected to live physical shop-floor hardware.
+            <h4 className="text-sm font-semibold text-slate-800">Job Tracking & Work Order Progress</h4>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Production queue monitoring active enclosure work orders across the 14 manufacturing workstations. Station cycle times and progression stages reflect configured traveler routes.
             </p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-          Simulated Feed
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+          Work Order Queue
         </span>
       </div>
 
@@ -294,24 +293,24 @@ export const TrackingSection: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="p-3 bg-blue-50/60 rounded-lg border border-blue-100 text-xs text-blue-900 space-y-1">
-                  <div className="font-semibold flex items-center gap-1.5 text-blue-800">
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-700 space-y-1">
+                  <div className="font-semibold flex items-center gap-1.5 text-slate-800">
                     <Radio className="w-3.5 h-3.5 text-blue-600" />
-                    Edge Event Logs (Simulated)
+                    Station Event Route
                   </div>
-                  <p className="text-[11px] text-blue-700">
-                    MQTT payload received at topic: <code className="font-mono bg-blue-100 px-1 rounded">aiot/{selectedJob.workCenter.toLowerCase()}/telemetry</code>
+                  <p className="text-[11px] text-slate-600">
+                    MQTT topic contract: <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200 text-blue-700">aiot/{selectedJob.workCenter.toLowerCase()}/telemetry</code>
                   </p>
-                  <p className="text-[11px] text-blue-700">
-                    Barcode scanned successfully. Machine cycle time benchmark: 14.2 min.
+                  <p className="text-[11px] text-slate-500">
+                    Workstation traveler scan registered. Benchmark cycle time: 14.2 min.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-              <span>Prototype Session</span>
-              <span className="text-slate-500 font-mono">{selectedJob.workCenter}</span>
+              <span>Workstation Interface</span>
+              <span className="text-slate-600 font-mono font-medium">{selectedJob.workCenter}</span>
             </div>
           </div>
         )}

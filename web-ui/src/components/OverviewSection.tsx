@@ -153,7 +153,7 @@ export const OverviewSection: React.FC<OverviewSectionProps> = ({
             3. Production Tracking
           </h3>
           <p className="text-xs text-slate-500 leading-relaxed mb-3">
-            Shop-floor work order queue, station progress indicators, and simulated machine event logs.
+            Shop-floor work order queue, station progress indicators, and configured machine event routes.
           </p>
           <span className="text-xs font-semibold text-amber-600 inline-flex items-center gap-1">
             Shop-Floor Tracking &rarr;

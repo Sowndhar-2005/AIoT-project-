@@ -6,6 +6,7 @@ import { RequirementsSection } from './components/RequirementsSection';
 import { ManufacturingSection } from './components/ManufacturingSection';
 import { CADSection } from './components/CADSection';
 import { TrackingSection } from './components/TrackingSection';
+import { IoTManagementSection } from './components/IoTManagementSection';
 import { QualitySection } from './components/QualitySection';
 import { FinalDocsSection } from './components/FinalDocsSection';
 import { DEFAULT_ENCLOSURE_RECORD, EnclosureRecord, PROCESSES_DATA, ProcessItem } from './data/projectData';
@@ -94,6 +95,8 @@ export function App() {
         return <CADSection />;
       case 'tracking':
         return <TrackingSection />;
+      case 'iot-management':
+        return <IoTManagementSection />;
       case 'quality':
         return <QualitySection />;
       case 'final-docs':

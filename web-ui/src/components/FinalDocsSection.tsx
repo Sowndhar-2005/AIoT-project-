@@ -3,30 +3,35 @@ import {
   FileText, 
   Download, 
   Layers, 
-  Printer, 
   CheckCircle2, 
+  AlertTriangle,
   Info,
   Maximize2,
   FileCheck,
   ShieldCheck,
   FileSpreadsheet,
   Workflow,
-  Sparkles
+  Eye,
+  ExternalLink
 } from 'lucide-react';
-import { EnclosureRecord, SAMPLE_COMPONENTS } from '../data/projectData';
-import { 
-  triggerFileDownload, 
-  generateBOMCSV, 
-  generateQuotationHTML, 
-  generateNestingSVG, 
-  generateAssemblySVG, 
-  generateWorkflowSVG, 
-  generateQualityReportHTML 
-} from '../utils/documentGenerator';
+import { EnclosureRecord } from '../data/projectData';
 
 interface FinalDocsSectionProps {
   enclosureRecord: EnclosureRecord;
   onUpdateRecord: (updated: Partial<EnclosureRecord>) => void;
+}
+
+interface EngineeringDeliverable {
+  id: string;
+  title: string;
+  filename: string;
+  format: 'PDF' | 'HTML' | 'DXF' | 'PNG';
+  sizeFormatted: string;
+  publicPath: string;
+  previewUrl?: string;
+  description: string;
+  isAvailable: boolean;
+  statusBadge: string;
 }
 
 export const FinalDocsSection: React.FC<FinalDocsSectionProps> = ({
@@ -34,104 +39,108 @@ export const FinalDocsSection: React.FC<FinalDocsSectionProps> = ({
   onUpdateRecord,
 }) => {
   const [showLightbox, setShowLightbox] = useState(false);
-  const [downloadSuccess, setDownloadSuccess] = useState<string | null>(null);
+  const [previewDocument, setPreviewDocument] = useState<EngineeringDeliverable | null>(null);
 
-  const selectedComps = SAMPLE_COMPONENTS.filter(c => enclosureRecord.selectedComponentIds.includes(c.id));
-  const compTotal = selectedComps.reduce((acc, c) => acc + (c.unitCost * enclosureRecord.quantity), 0);
-  
-  const steelWeightEst = Math.round((2 * (enclosureRecord.height * enclosureRecord.width + enclosureRecord.height * enclosureRecord.depth + enclosureRecord.width * enclosureRecord.depth) / 1e6) * enclosureRecord.thickness * 7.85 * 10) / 10;
-  const rawMaterialCost = Math.round(steelWeightEst * enclosureRecord.materialCostPerKg * enclosureRecord.quantity);
-  const fabricationLaborCost = Math.round((enclosureRecord.laserCutTimeMinutes / 60) * enclosureRecord.laborRatePerHour * enclosureRecord.quantity + (enclosureRecord.bendCyclesCount * 25 * enclosureRecord.quantity));
-  
-  const subtotal = compTotal + rawMaterialCost + fabricationLaborCost;
-  const tax = Math.round(subtotal * (enclosureRecord.taxPercent / 100));
-  const grandTotal = subtotal + tax;
-
-  const handleDownload = (type: string) => {
-    switch (type) {
-      case 'bom-csv':
-        const csv = generateBOMCSV(enclosureRecord);
-        triggerFileDownload(`BOM-${enclosureRecord.id}.csv`, csv, 'text/csv');
-        setDownloadSuccess('BOM CSV downloaded successfully.');
-        break;
-      case 'quotation-html':
-        const qHtml = generateQuotationHTML(enclosureRecord);
-        triggerFileDownload(`Quotation-${enclosureRecord.orderNumber}.html`, qHtml, 'text/html');
-        setDownloadSuccess('Commercial Quotation HTML downloaded.');
-        break;
-      case 'nesting-svg':
-        const nestSvg = generateNestingSVG(enclosureRecord);
-        triggerFileDownload(`Laser-Nesting-${enclosureRecord.id}.svg`, nestSvg, 'image/svg+xml');
-        setDownloadSuccess('Laser Nesting Schematic SVG downloaded.');
-        break;
-      case 'assembly-svg':
-        const assySvg = generateAssemblySVG(enclosureRecord);
-        triggerFileDownload(`Assembly-Drawing-${enclosureRecord.id}.svg`, assySvg, 'image/svg+xml');
-        setDownloadSuccess('Exploded Assembly Diagram SVG downloaded.');
-        break;
-      case 'workflow-svg':
-        const wfSvg = generateWorkflowSVG();
-        triggerFileDownload(`AIoT-Manufacturing-Workflow.svg`, wfSvg, 'image/svg+xml');
-        setDownloadSuccess('Manufacturing 14-Process Workflow SVG downloaded.');
-        break;
-      case 'quality-html':
-        const qaHtml = generateQualityReportHTML(enclosureRecord);
-        triggerFileDownload(`Quality-Report-CoC-${enclosureRecord.id}.html`, qaHtml, 'text/html');
-        setDownloadSuccess('Certificate of Conformance (CoC) Report downloaded.');
-        break;
-      default:
-        break;
+  // Map to the actual physical deliverables present in D:\Study\IOT Design and Deployment\iot project\web-ui\report
+  const deliverables: EngineeringDeliverable[] = [
+    {
+      id: 'doc-quotation',
+      title: 'Commercial Quotation (Approved Parameters)',
+      filename: 'Quotation_AIOT_Sheet_Metal_Enclosure.html',
+      format: 'HTML',
+      sizeFormatted: '8.3 KB',
+      publicPath: '/report/Quotation_AIOT_Sheet_Metal_Enclosure.html',
+      previewUrl: '/report/Quotation_AIOT_Sheet_Metal_Enclosure.html',
+      description: 'Approved commercial quotation ORD-9410-IN itemizing 6 component lines (MCCBs, MCBs, SMPS, Contactors), CRCA steel shell, fabrication tariffs, GST 18%, and total of ₹62,983.',
+      isAvailable: true,
+      statusBadge: 'Approved Deliverable'
+    },
+    {
+      id: 'doc-bom',
+      title: 'Engineering Bill of Materials (BOM)',
+      filename: 'BOM_AIOT_Sheet_Metal_Enclosure.pdf',
+      format: 'PDF',
+      sizeFormatted: '5.9 KB',
+      publicPath: '/report/BOM_AIOT_Sheet_Metal_Enclosure.pdf',
+      previewUrl: '/report/BOM_AIOT_Sheet_Metal_Enclosure.pdf',
+      description: 'Formal multi-tier BOM containing part identifiers, catalog descriptions, materials, and batch quantities for 5 enclosure units.',
+      isAvailable: true,
+      statusBadge: 'Approved Deliverable'
+    },
+    {
+      id: 'doc-laser-layout',
+      title: 'Provisional Laser-Cutting Nesting Layout',
+      filename: 'Laser_Cutting_Layout_Provisional.dxf',
+      format: 'DXF',
+      sizeFormatted: '2.5 KB',
+      publicPath: '/report/Laser_Cutting_Layout_Provisional.dxf',
+      description: 'Provisional DXF geometry with sheet boundary and component flat outlines. Marked as provisional for CAD review before machine cutting.',
+      isAvailable: true,
+      statusBadge: 'Provisional Layout'
+    },
+    {
+      id: 'doc-assembly',
+      title: 'Exploded Assembly & Engineering Infographic',
+      filename: 'Electrical Control Enclosure Engineering Infographic.png',
+      format: 'PNG',
+      sizeFormatted: '2.1 MB',
+      publicPath: '/report/Electrical Control Enclosure Engineering Infographic.png',
+      previewUrl: '/report/Electrical Control Enclosure Engineering Infographic.png',
+      description: 'High-resolution engineering infographic showing exploded structural relationships: chassis body, gasketed door, mounting flanges, and DIN sub-plate.',
+      isAvailable: true,
+      statusBadge: 'Visual Reference'
+    },
+    {
+      id: 'doc-workflow',
+      title: 'AIoT 14-Process Workflow Architecture',
+      filename: 'AIoT_14_Process_Workflow_Diagram.pdf',
+      format: 'PDF',
+      sizeFormatted: '30.5 KB',
+      publicPath: '/report/AIoT_14_Process_Workflow_Diagram.pdf',
+      previewUrl: '/report/AIoT_14_Process_Workflow_Diagram.pdf',
+      description: 'System flow diagram illustrating the handoffs between customer requirements, CAD optimization, physical fabrication, and optical metrology inspection.',
+      isAvailable: true,
+      statusBadge: 'Approved Architecture'
+    },
+    {
+      id: 'doc-coc',
+      title: 'Certificate of Conformance (Awaiting Physical Inspection)',
+      filename: 'Certificate_of_Conformance_AIOT_Enclosure_Demo.pdf',
+      format: 'PDF',
+      sizeFormatted: '5.3 KB',
+      publicPath: '/report/Certificate_of_Conformance_AIOT_Enclosure_Demo.pdf',
+      previewUrl: '/report/Certificate_of_Conformance_AIOT_Enclosure_Demo.pdf',
+      description: 'Draft Certificate of Conformance detailing the 6 mandatory quality gates (dimensions, deburring, powder DFT 60-80µm, door seal, earth bonding <0.1Ω).',
+      isAvailable: true,
+      statusBadge: 'Inspection Pending'
     }
-
-    setTimeout(() => setDownloadSuccess(null), 3500);
-  };
-
-  const allGatesPassed = Object.values(enclosureRecord.qaGateChecks).every(v => v === true);
-
-  const handleSimulateRelease = () => {
-    if (!allGatesPassed) return;
-    onUpdateRecord({
-      status: 'Released (CoC Signed)',
-      qaApproved: true
-    });
-  };
+  ];
 
   return (
     <div className="space-y-6">
       {/* Top Banner Context */}
       <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-700 mb-1">
-            <FileCheck className="w-4 h-4 text-emerald-600" />
-            <span>Process 14: Final Deliverables & Document Workspace</span>
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-blue-700 mb-1">
+            <FileCheck className="w-4 h-4 text-blue-600" />
+            <span>Process 14: Engineering Deliverables & Document Centre</span>
           </div>
-          <h2 className="text-xl font-bold text-slate-900">Final Enclosure Release & Client-Side Document Centre</h2>
+          <h2 className="text-xl font-bold text-slate-900">Enclosure Release Records & Engineering Documents</h2>
           <p className="text-xs text-slate-500 max-w-2xl mt-0.5">
-            Download client-side generated engineering documents, manufacturing drawings, quotation previews, 
-            and the final Certificate of Conformance (CoC).
+            Verified engineering deliverables located in the project repository (<code className="font-mono text-slate-700 bg-slate-100 px-1 py-0.5 rounded">web-ui/report</code>). 
+            Review technical documentation, download approved files, and audit parameter consistency.
           </p>
         </div>
         <div className="flex items-center gap-2 self-start md:self-auto">
-          <span className={`px-3 py-1 rounded text-xs font-bold border ${
-            enclosureRecord.status === 'Released (CoC Signed)' 
-              ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-              : 'bg-amber-50 text-amber-700 border-amber-200'
-          }`}>
-            {enclosureRecord.status}
+          <span className="px-3 py-1 rounded text-xs font-semibold border bg-slate-100 text-slate-700 border-slate-200">
+            6 Documents Integrated
           </span>
         </div>
       </div>
 
-      {downloadSuccess && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-xs font-semibold flex items-center justify-between animate-fadeIn">
-          <span>✓ {downloadSuccess}</span>
-          <button onClick={() => setDownloadSuccess(null)} className="text-emerald-600 hover:text-emerald-900 font-bold">✕</button>
-        </div>
-      )}
-
-      {/* Main Grid: Enclosure Summary on Left, Document Center on Right */}
+      {/* Main Grid: Enclosure Record on Left (5 Cols), Document Center on Right (7 Cols) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Enclosure Technical Portfolio (5 Cols) */}
+        {/* Left Column: Enclosure Technical Portfolio & Discrepancy Audit */}
         <div className="lg:col-span-5 bg-white rounded-lg border border-slate-200 shadow-xs p-5 space-y-4">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100">
             <div>
@@ -141,25 +150,25 @@ export const FinalDocsSection: React.FC<FinalDocsSectionProps> = ({
             <button
               onClick={() => setShowLightbox(true)}
               className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded"
-              title="Expand enclosure render"
+              title="Expand enclosure technical drawing"
             >
               <Maximize2 size={16} />
             </button>
           </div>
 
-          {/* Enclosure Render Image */}
+          {/* Enclosure Technical Reference Image */}
           <div 
             onClick={() => setShowLightbox(true)}
             className="rounded-lg overflow-hidden border border-slate-200 bg-slate-50 cursor-pointer group relative"
           >
             <img
-              src={enclosureRecord.primaryDrawingImage}
-              alt="Final Enclosure Model"
+              src="/assets/images/cad/enclosure-drawing-render.png"
+              alt="Enclosure Orthographic Drawing and 3D Render"
               className="w-full h-56 object-contain bg-white p-2 group-hover:scale-[1.02] transition-transform duration-200"
             />
             <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors flex items-center justify-center">
               <span className="opacity-0 group-hover:opacity-100 bg-white/90 backdrop-blur-xs px-3 py-1 text-xs font-semibold text-slate-800 shadow-md transition-opacity">
-                Click to Expand Render & Drawing
+                Click to Expand Reference Drawing
               </span>
             </div>
           </div>
@@ -174,193 +183,147 @@ export const FinalDocsSection: React.FC<FinalDocsSectionProps> = ({
             </div>
             <div className="flex justify-between py-1.5 border-b border-slate-100">
               <span className="text-slate-500">Material Specification</span>
-              <span className="font-medium text-slate-800">{enclosureRecord.material} ({enclosureRecord.thickness}mm)</span>
+              <span className="font-medium text-slate-800">{enclosureRecord.material}</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-slate-100">
-              <span className="text-slate-500">Surface Finish & Ingress</span>
-              <span className="font-medium text-slate-800">{enclosureRecord.finish} | {enclosureRecord.ipRating}</span>
+              <span className="text-slate-500">Sheet Gauge & Finish</span>
+              <span className="font-medium text-slate-800">{enclosureRecord.thickness} mm | {enclosureRecord.finish}</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-slate-100">
-              <span className="text-slate-500">CAD Master Model</span>
-              <span className="font-mono text-blue-700">{enclosureRecord.cadModelRef}</span>
+              <span className="text-slate-500">Quoted Total Commercial Value</span>
+              <span className="font-mono font-bold text-blue-700">₹62,983.00 (Incl. 18% GST)</span>
             </div>
             <div className="flex justify-between py-1.5 border-b border-slate-100">
-              <span className="text-slate-500">Total Commercial Estimation</span>
-              <span className="font-mono font-bold text-emerald-700">₹ {grandTotal.toLocaleString()}</span>
+              <span className="text-slate-500">Quality Release State</span>
+              <span className="font-semibold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                Awaiting Physical Inspection
+              </span>
             </div>
           </div>
 
-          {/* Final Release Action Button */}
-          <div className="pt-2">
-            {enclosureRecord.status === 'Released (CoC Signed)' ? (
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-800 flex items-center gap-2">
-                <ShieldCheck size={18} className="text-emerald-600 shrink-0" />
-                <div>
-                  <div className="font-bold">Enclosure Certified & Released</div>
-                  <div className="text-[11px] text-emerald-700">Digital CoC certificate signed by {enclosureRecord.qaInspectorName}.</div>
-                </div>
-              </div>
-            ) : (
-              <button
-                onClick={handleSimulateRelease}
-                disabled={!allGatesPassed}
-                className={`w-full py-2.5 px-4 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-colors ${
-                  allGatesPassed 
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs' 
-                    : 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                }`}
-              >
-                <ShieldCheck size={15} /> 
-                {allGatesPassed ? 'Authorize Release & Sign CoC Certificate' : 'Requires All 6 QA Gates Passed'}
-              </button>
-            )}
+          {/* Data Consistency & Discrepancy Audit Box */}
+          <div className="p-3.5 bg-amber-50/80 rounded-lg border border-amber-200 text-xs space-y-1.5 text-amber-900">
+            <div className="font-bold flex items-center gap-1.5 text-amber-800">
+              <AlertTriangle size={14} className="text-amber-600 shrink-0" />
+              <span>Specification Audit Notice</span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-amber-800">
+              The approved commercial quotation (<code className="font-mono">ORD-9410-IN</code>) and BOM specify a 5-unit batch with total value <strong>₹62,983.00</strong>. 
+              The supplied orthographic drawing shows modular gland-plate cutouts and external mounting flanges. 
+              Always review the exact dimensional callouts on the drawing sheet before shop-floor cutting.
+            </p>
           </div>
         </div>
 
-        {/* Right Column: Download Centre (7 Cols) */}
+        {/* Right Column: Integrated Real Deliverable Document Centre (7 Cols) */}
         <div className="lg:col-span-7 bg-white rounded-lg border border-slate-200 shadow-xs p-6 space-y-4">
           <div className="border-b border-slate-100 pb-3">
-            <h3 className="text-sm font-bold text-slate-900">Client-Side Document Generator Centre</h3>
-            <p className="text-xs text-slate-500">Real, downloadable engineering files generated directly from the current enclosure parameters</p>
+            <h3 className="text-sm font-bold text-slate-900">Approved Engineering Deliverables Directory</h3>
+            <p className="text-xs text-slate-500">Directly linked to files in <code className="font-mono text-slate-700 bg-slate-100 px-1 py-0.5 rounded">web-ui/report</code></p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-            {/* Card 1: Quotation */}
-            <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="p-1.5 bg-blue-100 text-blue-700 rounded-md">
-                    <FileText size={16} />
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">HTML / Print</span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 mt-2">Commercial Quotation</h4>
-                <p className="text-[11px] text-slate-500">
-                  Itemized pricing covering components (₹{compTotal.toLocaleString()}), raw steel (₹{rawMaterialCost.toLocaleString()}), and fabrication labor.
-                </p>
-              </div>
-              <button
-                onClick={() => handleDownload('quotation-html')}
-                className="w-full py-1.5 px-3 bg-white hover:bg-blue-50 text-blue-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+            {deliverables.map((doc) => (
+              <div 
+                key={doc.id}
+                className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between"
               >
-                <Download size={13} /> Download Quotation
-              </button>
-            </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="px-2 py-0.5 rounded font-mono text-[10px] font-bold bg-white border border-slate-200 text-slate-700">
+                      {doc.format} • {doc.sizeFormatted}
+                    </span>
+                    <span className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
+                      doc.statusBadge === 'Approved Deliverable' || doc.statusBadge === 'Approved Architecture'
+                        ? 'bg-blue-50 text-blue-700 border-blue-200'
+                        : 'bg-amber-50 text-amber-700 border-amber-200'
+                    }`}>
+                      {doc.statusBadge}
+                    </span>
+                  </div>
 
-            {/* Card 2: Bill of Materials */}
-            <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-md">
-                    <FileSpreadsheet size={16} />
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">CSV Spreadsheet</span>
+                  <h4 className="text-xs font-bold text-slate-900 mt-2">{doc.title}</h4>
+                  <div className="font-mono text-[10px] text-slate-400 truncate mt-0.5">{doc.filename}</div>
+                  <p className="text-[11px] text-slate-600 mt-1 line-clamp-3 leading-relaxed">
+                    {doc.description}
+                  </p>
                 </div>
-                <h4 className="text-xs font-bold text-slate-900 mt-2">Bill of Materials (BOM)</h4>
-                <p className="text-[11px] text-slate-500">
-                  Multi-tier structured CSV containing verified component models, mounting brackets, and raw steel gauge specifications.
-                </p>
-              </div>
-              <button
-                onClick={() => handleDownload('bom-csv')}
-                className="w-full py-1.5 px-3 bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Download size={13} /> Download BOM (.csv)
-              </button>
-            </div>
 
-            {/* Card 3: Laser Nesting Layout */}
-            <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="p-1.5 bg-sky-100 text-sky-700 rounded-md">
-                    <Layers size={16} />
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">Vector SVG</span>
+                <div className="pt-2 border-t border-slate-200/80 flex items-center gap-2">
+                  <a
+                    href={doc.publicPath}
+                    download={doc.filename}
+                    className="flex-1 py-1.5 px-3 bg-white hover:bg-blue-50 text-blue-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
+                  >
+                    <Download size={13} /> Download
+                  </a>
+                  {doc.previewUrl && (
+                    <button
+                      onClick={() => setPreviewDocument(doc)}
+                      className="py-1.5 px-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold flex items-center gap-1"
+                      title="Preview document in browser"
+                    >
+                      <Eye size={13} /> Preview
+                    </button>
+                  )}
                 </div>
-                <h4 className="text-xs font-bold text-slate-900 mt-2">Laser Nesting Schematic</h4>
-                <p className="text-[11px] text-slate-500">
-                  2500 × 1250 mm sheet layout preview showing chassis, door, and gland plate positioning (84.7% utilization).
-                </p>
               </div>
-              <button
-                onClick={() => handleDownload('nesting-svg')}
-                className="w-full py-1.5 px-3 bg-white hover:bg-sky-50 text-sky-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Download size={13} /> Download Nesting (.svg)
-              </button>
-            </div>
-
-            {/* Card 4: Assembly Exploded View */}
-            <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="p-1.5 bg-indigo-100 text-indigo-700 rounded-md">
-                    <Layers size={16} />
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">Vector SVG</span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 mt-2">Exploded Assembly View</h4>
-                <p className="text-[11px] text-slate-500">
-                  Schematic CAD diagram showing chassis, rear equipment sub-plate, front door, polyurethane seal, and gland plates.
-                </p>
-              </div>
-              <button
-                onClick={() => handleDownload('assembly-svg')}
-                className="w-full py-1.5 px-3 bg-white hover:bg-indigo-50 text-indigo-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Download size={13} /> Download Assembly (.svg)
-              </button>
-            </div>
-
-            {/* Card 5: Manufacturing Workflow Diagram */}
-            <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="p-1.5 bg-amber-100 text-amber-700 rounded-md">
-                    <Workflow size={16} />
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">Vector SVG</span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 mt-2">14-Process Workflow Diagram</h4>
-                <p className="text-[11px] text-slate-500">
-                  Visual roadmap linking CAD optimization (P01-P07), physical fabrication (P08-P09), and metrology QA (P12-P14).
-                </p>
-              </div>
-              <button
-                onClick={() => handleDownload('workflow-svg')}
-                className="w-full py-1.5 px-3 bg-white hover:bg-amber-50 text-amber-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Download size={13} /> Download Workflow (.svg)
-              </button>
-            </div>
-
-            {/* Card 6: Quality Report & CoC */}
-            <div className="p-4 rounded-lg border border-slate-200 hover:border-blue-300 transition-all bg-slate-50/50 space-y-2.5 flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="p-1.5 bg-emerald-100 text-emerald-700 rounded-md">
-                    <ShieldCheck size={16} />
-                  </span>
-                  <span className="text-[10px] font-mono text-slate-400">Printable HTML</span>
-                </div>
-                <h4 className="text-xs font-bold text-slate-900 mt-2">Certificate of Conformance</h4>
-                <p className="text-[11px] text-slate-500">
-                  Formal inspection audit certificate covering all 6 mandatory QA gates (dimensions, coating, grounding, and BOM).
-                </p>
-              </div>
-              <button
-                onClick={() => handleDownload('quality-html')}
-                className="w-full py-1.5 px-3 bg-white hover:bg-emerald-50 text-emerald-700 border border-slate-200 rounded text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors"
-              >
-                <Download size={13} /> Download CoC Report
-              </button>
-            </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Lightbox Modal */}
+      {/* Document In-App Preview Modal */}
+      {previewDocument && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+          onClick={() => setPreviewDocument(null)}
+        >
+          <div 
+            className="bg-white rounded-xl shadow-2xl max-w-5xl w-full h-[85vh] flex flex-col p-4 space-y-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+              <div>
+                <span className="text-xs font-mono font-bold text-blue-600">{previewDocument.filename}</span>
+                <h4 className="text-sm font-bold text-slate-900">{previewDocument.title}</h4>
+              </div>
+              <div className="flex items-center gap-2">
+                <a 
+                  href={previewDocument.publicPath} 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="px-2.5 py-1 text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 rounded flex items-center gap-1"
+                >
+                  <ExternalLink size={12} /> Open in New Tab
+                </a>
+                <button 
+                  onClick={() => setPreviewDocument(null)}
+                  className="text-slate-400 hover:text-slate-700 text-sm font-bold px-2 py-1 rounded hover:bg-slate-100"
+                >
+                  ✕ Close
+                </button>
+              </div>
+            </div>
+
+            <div className="flex-1 w-full bg-slate-100 rounded border border-slate-200 overflow-hidden">
+              {previewDocument.format === 'PNG' ? (
+                <div className="w-full h-full flex items-center justify-center p-4 overflow-auto">
+                  <img src={previewDocument.publicPath} alt={previewDocument.title} className="max-w-full max-h-full object-contain" />
+                </div>
+              ) : (
+                <iframe 
+                  src={previewDocument.publicPath} 
+                  title={previewDocument.title} 
+                  className="w-full h-full border-0"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Modal for Drawing */}
       {showLightbox && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
@@ -372,7 +335,7 @@ export const FinalDocsSection: React.FC<FinalDocsSectionProps> = ({
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-xs font-mono font-bold text-blue-600">
-                High-Resolution Engineering Render & Drawings: {enclosureRecord.id}
+                High-Resolution Enclosure Drawing & 3D Render: {enclosureRecord.id}
               </span>
               <button 
                 onClick={() => setShowLightbox(false)}
@@ -383,7 +346,7 @@ export const FinalDocsSection: React.FC<FinalDocsSectionProps> = ({
             </div>
             <div className="max-h-[75vh] overflow-auto rounded border border-slate-200 bg-white flex items-center justify-center p-4">
               <img 
-                src={enclosureRecord.primaryDrawingImage} 
+                src="/assets/images/cad/enclosure-drawing-render.png" 
                 alt="Enclosure Drawing Full View" 
                 className="w-full h-auto object-contain" 
               />

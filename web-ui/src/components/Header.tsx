@@ -23,7 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
       case 'requirements': return 'New Enclosure Specifications & RFQ Intake';
       case 'manufacturing': return '14-Process Manufacturing Engineering Workflow';
       case 'cad': return 'CAD Design, Digital Component Library & BOM';
-      case 'tracking': return 'Real-Time Production Tracking & Work Order Queue';
+      case 'tracking': return 'Production Tracking & Work Order Queue';
+      case 'iot-management': return 'Industrial Equipment & IoT Device Management';
       case 'quality': return 'Computer-Vision Metrology & Quality Acceptance';
       case 'final-docs': return 'Final Enclosure Release & Document Centre';
       default: return 'Manufacturing Platform';

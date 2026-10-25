@@ -5,6 +5,7 @@ import {
   Layers, 
   Box, 
   Activity, 
+  Cpu,
   CheckCircle2, 
   FileCheck, 
   X,
@@ -35,8 +36,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'manufacturing', label: '3. Manufacturing Workflow', icon: Layers },
     { id: 'cad', label: '4. CAD & Component Library', icon: Box },
     { id: 'tracking', label: '5. Production Tracking', icon: Activity },
-    { id: 'quality', label: '6. Quality Inspection', icon: CheckCircle2 },
-    { id: 'final-docs', label: '7. Final Enclosure & Docs', icon: FileCheck },
+    { id: 'iot-management', label: '6. IoT Management', icon: Cpu },
+    { id: 'quality', label: '7. Quality Inspection', icon: CheckCircle2 },
+    { id: 'final-docs', label: '8. Final Enclosure & Docs', icon: FileCheck },
   ];
 
   return (

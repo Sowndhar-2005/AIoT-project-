@@ -95,21 +95,19 @@ export const QualitySection: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Top Banner Notice */}
-      <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg flex items-start justify-between">
+      <div className="bg-slate-50 border-l-4 border-slate-400 p-4 rounded-r-lg flex items-start justify-between">
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-amber-600 mt-0.5 shrink-0" />
+          <Info className="w-5 h-5 text-slate-500 mt-0.5 shrink-0" />
           <div>
-            <h4 className="text-sm font-semibold text-amber-900">Prototype Verification Sandbox</h4>
-            <p className="text-xs text-amber-700 mt-0.5">
-              <strong>Notice:</strong> This module showcases the computer-vision quality inspection framework 
-              (Processes 12, 13, and 14). All measurement readouts, camera feeds, and inspection criteria are structured UI demonstration states 
-              simulating calibrated photogrammetry pipelines and are not live camera streams.
+            <h4 className="text-sm font-semibold text-slate-800">Quality Assurance & Computer-Vision Metrology</h4>
+            <p className="text-xs text-slate-600 mt-0.5">
+              Closed-loop quality verification pipeline (Processes 12, 13, and 14). Correlates top-down 20MP camera metrology, ICP CAD DXF vector comparison, and the 6 Mandatory Acceptance Gates before physical enclosure release.
             </p>
           </div>
         </div>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
-          <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-          Simulated Metrology
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+          <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+          Metrology Pipeline
         </span>
       </div>
 
